@@ -41,5 +41,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
     bool gotDamnILoveToClap=true;
+    bool clappingJustMakesMeSoHappy=true;
     return nullptr;
 }
