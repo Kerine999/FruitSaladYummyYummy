@@ -8,7 +8,7 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-    this.side=side;
+    this->side=side;
     if(side==BLACK)
     {
         opponent=WHITE;
@@ -17,7 +17,7 @@ Player::Player(Side side) {
     {
         opponent=BLACK;
     }
-    currBoard=board();
+    currBoard=Board();
 }
 
 /*
@@ -29,15 +29,15 @@ Player::~Player() {
 /*
  * Returns a list of the possible moves for your side.
  */
-vector<Move> possMoves()
+vector<Move*> Player::possMoves()
 {
-    vector<Move> poss;
+    vector<Move*> poss;
     for(int i=0;i<8;i++)
     {
         for(int k=0;k<8;k++)
         {
             Move* curr=new Move(i,k);
-            if(checkMove(curr,side))
+            if(currBoard.checkMove(curr,side))
             {
                 poss.push_back(curr);
             }
@@ -61,6 +61,6 @@ vector<Move> possMoves()
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     currBoard.doMove(opponentsMove, opponent);
-    vector<Move> poss=possMoves();
+    vector<Move*> poss=possMoves();
     return poss[0];
 }
