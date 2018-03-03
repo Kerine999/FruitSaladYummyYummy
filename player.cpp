@@ -8,18 +8,42 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-
-    /*
-     * TODO: Do any initialization you need to do here (setting up the board,
-     * precalculating things, etc.) However, remember that you will only have
-     * 30 seconds.
-     */
+    this.side=side;
+    if(side==BLACK)
+    {
+        opponent=WHITE;
+    }
+    else
+    {
+        opponent=BLACK;
+    }
+    currBoard=board();
 }
 
 /*
  * Destructor for the player.
  */
 Player::~Player() {
+}
+
+/*
+ * Returns a list of the possible moves for your side.
+ */
+vector<Move> possMoves()
+{
+    vector<Move> poss;
+    for(int i=0;i<8;i++)
+    {
+        for(int k=0;k<8;k++)
+        {
+            Move* curr=new Move(i,k);
+            if(checkMove(curr,side))
+            {
+                poss.push_back(curr);
+            }
+        }
+    }
+    return poss;
 }
 
 /*
@@ -36,11 +60,7 @@ Player::~Player() {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
-    bool gotDamnILoveToClap=true;
-    bool clappingJustMakesMeSoHappy=true;
-    return nullptr;
+    currBoard.doMove(opponentsMove, opponent);
+    vector<Move> poss=possMoves();
+    return poss[0];
 }
