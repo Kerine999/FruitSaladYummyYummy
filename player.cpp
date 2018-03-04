@@ -41,13 +41,17 @@ vector<Move*> Player::possMoves()
             {
                 poss.push_back(curr);
             }
+            else
+            {
+                delete curr;
+            }
         }
     }
     return poss;
 }
 
 /**
- * Returns the best move from a list of moves using the heuristic 
+ * Returns the best move from a list of moves using the heuristic
  * number of our pieces-number of opponent pieces. *3 multiplier for corner moves.
  */
 Move* Player::best(vector<Move*> poss)
@@ -76,7 +80,7 @@ Move* Player::best(vector<Move*> poss)
             best=tempHeur;
             bestIndex=i;
         }
-        delete temp; 
+        delete temp;
     }
     return poss[bestIndex];
 }
