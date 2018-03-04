@@ -72,7 +72,7 @@ Move* Player::best(vector<Move*> poss)
             best=tempHeur;
             bestIndex=i;
         }
-        delete temp; //**Might need to write destructor for Board class - unsure**
+        delete temp; 
     }
     return poss[bestIndex];
 }
