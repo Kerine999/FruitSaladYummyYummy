@@ -101,6 +101,10 @@ Move* Player::best(vector<Move*> poss)
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     currBoard.doMove(opponentsMove, opponent);
     vector<Move*> poss=possMoves();
+    if(poss.size() == 0)
+    {
+        return nullptr;
+    }
     Move* move=best(poss);
     currBoard.doMove(move, side);
     for(int i=0;i<poss.size();i++)
