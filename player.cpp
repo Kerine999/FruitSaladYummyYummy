@@ -62,5 +62,6 @@ vector<Move*> Player::possMoves()
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     currBoard.doMove(opponentsMove, opponent);
     vector<Move*> poss=possMoves();
+    currBoard.doMove(poss[0], side);
     return poss[0];
 }
