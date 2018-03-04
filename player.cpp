@@ -95,5 +95,12 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     vector<Move*> poss=possMoves();
     Move* move=best(poss);
     currBoard.doMove(move, side);
+    for(int i=0;i<poss.size();i++)
+    {
+        if(poss[i]!=move)
+        {
+            delete poss[i];
+        }
+    }
     return move;
 }
