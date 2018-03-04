@@ -48,7 +48,7 @@ vector<Move*> Player::possMoves()
 
 /**
  * Returns the best move from a list of moves using the heuristic 
- * number of our pieces-number of opponent pieces
+ * number of our pieces-number of opponent pieces. *3 multiplier for corner moves.
  */
 Move* Player::best(vector<Move*> poss)
 {
@@ -66,6 +66,10 @@ Move* Player::best(vector<Move*> poss)
         else
         {
             tempHeur=temp->countWhite()-temp->countBlack();
+        }
+        if((poss[i]->getX()==0||poss[i]->getX()==7)&&(poss[i]->getY()==0||poss[i]->getY()==7))
+        {
+            tempHeur*=3;
         }
         if(tempHeur>best)
         {
