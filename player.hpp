@@ -18,7 +18,7 @@ public:
     Move* best(vector<Move*> poss);
 
     // Flag to tell if the player is running within the test_minimax context
-    bool testingMinimax;
+    bool testingMinimax = true;
     Side opponent;
     Board currBoard;
     Side side;
