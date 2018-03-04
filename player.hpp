@@ -15,6 +15,7 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
     vector<Move*> possMoves();
+    Move* best(vector<Move*> poss);
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;

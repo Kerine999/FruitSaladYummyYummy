@@ -46,6 +46,37 @@ vector<Move*> Player::possMoves()
     return poss;
 }
 
+/**
+ * Returns the best move from a list of moves using the heuristic 
+ * number of our pieces-number of opponent pieces
+ */
+Move* Player::best(vector<Move*> poss)
+{
+    int bestIndex=0;
+    int best=-100;
+    for (int i=0;i<poss.size();i++)
+    {
+        Board* temp=currBoard.copy();
+        temp->doMove(poss[i],side);
+        int tempHeur;
+        if(side==BLACK)
+        {
+            tempHeur=temp->countBlack()-temp->countWhite();
+        }
+        else
+        {
+            tempHeur=temp->countWhite()-temp->countBlack();
+        }
+        if(tempHeur>best)
+        {
+            best=tempHeur;
+            bestIndex=i;
+        }
+        delete temp; //**Might need to write destructor for Board class - unsure**
+    }
+    return poss[bestIndex];
+}
+
 /*
  * Compute the next move given the opponent's last move. Your AI is
  * expected to keep track of the board on its own. If this is the first move,
@@ -62,6 +93,7 @@ vector<Move*> Player::possMoves()
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     currBoard.doMove(opponentsMove, opponent);
     vector<Move*> poss=possMoves();
-    currBoard.doMove(poss[0], side);
-    return poss[0];
+    Move* move=best(poss);
+    currBoard.doMove(move, side);
+    return move;
 }
