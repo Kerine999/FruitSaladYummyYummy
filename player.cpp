@@ -52,7 +52,9 @@ vector<Move*> Player::possMoves()
 
 /**
  * Returns the best move from a list of moves using the heuristic
- * number of our pieces-number of opponent pieces. *3 multiplier for corner moves.
+ * number of our pieces-number of opponent pieces. *5 multiplier for corner moves,
+ * *3 multiplier to edge moves not adjacent to corner, /5 multiplier for move diagonally
+ * adjacent to corner, /3 multiplier for edge moves adjacent to corner.
  */
 Move* Player::best(vector<Move*> poss)
 {
@@ -73,7 +75,27 @@ Move* Player::best(vector<Move*> poss)
         }
         if((poss[i]->getX()==0||poss[i]->getX()==7)&&(poss[i]->getY()==0||poss[i]->getY()==7))
         {
+            tempHeur*=5;
+        }
+        else if((poss[i]->getX()>=2 && poss[i]->getX()<=5)&&(poss[i]->getY()==0||poss[i]->getY()==7))
+        {
             tempHeur*=3;
+        }
+        else if((poss[i]->getX()==0||poss[i]->getX()==7)&&(poss[i]->getY()>=2&&poss[i]->getY()<=5))
+        {
+            tempHeur*=3;
+        }
+        else if((poss[i]->getX()==1||poss[i]->getX()==6)&&(poss[i]->getY()==1||poss[i]->getY()==6))
+        {
+            tempHeur/=5;
+        }
+        else if((poss[i]->getX()==0||poss[i]->getX()==7)&&(poss[i]->getY()==1||poss[i]->getY()==6))
+        {
+            tempHeur/=3;
+        }
+        else if((poss[i]->getX()==1||poss[i]->getX()==6)&&(poss[i]->getY()==0||poss[i]->getY()==7))
+        {
+            tempHeur/=3;
         }
         if(tempHeur>best)
         {
