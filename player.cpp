@@ -29,7 +29,7 @@ Player::~Player() {
 /*
  * Returns a list of the possible moves for your side.
  */
-vector<Move*> Player::possMoves(Board board, Side side)
+vector<Move*> Player::possMoves(Board board, Side playSide)
 {
     vector<Move*> poss;
     for(int i=0;i<8;i++)
@@ -37,7 +37,7 @@ vector<Move*> Player::possMoves(Board board, Side side)
         for(int k=0;k<8;k++)
         {
             Move* curr=new Move(i,k);
-            if(board.checkMove(curr,side))
+            if(board.checkMove(curr,playSide))
             {
                 poss.push_back(curr);
             }
@@ -51,60 +51,65 @@ vector<Move*> Player::possMoves(Board board, Side side)
 }
 
 /**
- * Returns the best move from a list of moves using the heuristic
- * number of our pieces-number of opponent pieces. *5 multiplier for corner moves,
- * *3 multiplier to edge moves not adjacent to corner, /5 multiplier for move diagonally
- * adjacent to corner, /3 multiplier for edge moves adjacent to corner.
+ * Assigns a weight to a move given a particular board state and a side to check.
  */
-Move* Player::best(vector<Move*> poss)
+int Player::getWeight(Move* move, Board* testBoard, Side playSide)
 {
-    int bestIndex=0;
-    int best=-100;
-    for (int i=0;i<(int)poss.size();i++)
+    Board* temp=testBoard->copy();
+    int tempHeur = 0;
+    if(playSide==BLACK)
     {
-        Board* temp=currBoard.copy();
-        temp->doMove(poss[i],side);
-        int tempHeur;
-        if(side==BLACK)
-        {
-            tempHeur=temp->countBlack()-temp->countWhite();
-        }
-        else
-        {
-            tempHeur=temp->countWhite()-temp->countBlack();
-        }
-        if((poss[i]->getX()==0||poss[i]->getX()==7)&&(poss[i]->getY()==0||poss[i]->getY()==7))
-        {
-            tempHeur*=5;
-        }
-        else if((poss[i]->getX()>=2 && poss[i]->getX()<=5)&&(poss[i]->getY()==0||poss[i]->getY()==7))
-        {
-            tempHeur*=3;
-        }
-        else if((poss[i]->getX()==0||poss[i]->getX()==7)&&(poss[i]->getY()>=2&&poss[i]->getY()<=5))
-        {
-            tempHeur*=3;
-        }
-        else if((poss[i]->getX()==1||poss[i]->getX()==6)&&(poss[i]->getY()==1||poss[i]->getY()==6))
-        {
-            tempHeur/=5;
-        }
-        else if((poss[i]->getX()==0||poss[i]->getX()==7)&&(poss[i]->getY()==1||poss[i]->getY()==6))
-        {
-            tempHeur/=3;
-        }
-        else if((poss[i]->getX()==1||poss[i]->getX()==6)&&(poss[i]->getY()==0||poss[i]->getY()==7))
-        {
-            tempHeur/=3;
-        }
-        if(tempHeur>best)
-        {
-            best=tempHeur;
-            bestIndex=i;
-        }
-        delete temp;
+        tempHeur=temp->countBlack()-temp->countWhite();
     }
-    return poss[bestIndex];
+    else
+    {
+        tempHeur=temp->countWhite()-temp->countBlack();
+    }
+    if((move->getX()==0||move->getX()==7)&&(move->getY()==0||move->getY()==7))
+    {
+        if(tempHeur < 0)
+            tempHeur/=40;
+        else
+            tempHeur*=40;
+    }
+    else if((move->getX()>=2 && move->getX()<=5)&&(move->getY()==0||move->getY()==7))
+    {
+        if(tempHeur < 0)
+            tempHeur/=20;
+        else
+            tempHeur*=20;
+    }
+    else if((move->getX()==0||move->getX()==7)&&(move->getY()>=2&&move->getY()<=5))
+    {
+        if(tempHeur < 0)
+            tempHeur/=20;
+        else
+            tempHeur*=20;
+    }
+    else if((move->getX()==1||move->getX()==6)&&(move->getY()==1||move->getY()==6))
+    {
+        if(tempHeur < 0)
+            tempHeur*=40;
+        else
+            tempHeur/=40;
+    }
+    else if((move->getX()==0||move->getX()==7)&&(move->getY()==1||move->getY()==6))
+    {
+        if(tempHeur < 0)
+            tempHeur*=20;
+        else
+            tempHeur/=20;
+    }
+    else if((move->getX()==1||move->getX()==6)&&(move->getY()==0||move->getY()==7))
+    {
+        if(tempHeur < 0)
+            tempHeur*=20;
+        else
+            tempHeur/=20;
+    }
+    delete temp;
+
+    return tempHeur;
 }
 
 /*
@@ -126,26 +131,94 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     {
         return mini_max();
     }
-    vector<Move*> poss=possMoves(currBoard, side);
+    return make_move();
+}
+
+/*
+ * Find the optimal move for the opponent to make for the simple heuristic, given
+ * a specific board state.
+ */
+Move *Player::findOppMove1(Board board)
+{
+    vector<Move*> opponent_poss = possMoves(board, opponent);
+    if(opponent_poss.size() == 0)
+    {
+        return nullptr;
+    }
+    Move *opp_move = nullptr;
+    int tempDiff, pieces = -10000;
+    for(Move * move : opponent_poss)
+    {
+        Board* temp = board.copy();
+        temp->doMove(move, opponent);
+        tempDiff = getWeight(move, temp, opponent);
+        if(pieces < tempDiff)
+        {
+            pieces = tempDiff;
+            opp_move = move;
+        }
+        delete temp;
+    }
+    Move * opp = new Move(opp_move->getX(), opp_move->getY());
+    for(int i = 0; i < (int) opponent_poss.size(); i++)
+    {
+        delete opponent_poss[i];
+    }
+    return opp;
+}
+
+/*
+ * Perform a move using the simple heuristic, which is essentially a 2-ply mini_max
+ * which applies the heuristic used in getWeight() rather than simply the
+ * difference between stones.
+ */
+Move *Player::make_move()
+{
+    vector<Move*> poss = possMoves(currBoard, side);
+    int weight = -10000, tempWeight = 0;
+    Move* finalMove = nullptr;
     if(poss.size() == 0)
     {
         return nullptr;
     }
-    Move* move=best(poss);
-    currBoard.doMove(move, side);
-    for(int i=0;i<(int)poss.size();i++)
+    for(Move * move : poss)
     {
-        if(poss[i]!=move)
+        Board *newBoard = currBoard.copy();
+        newBoard->doMove(move, side);
+        Move *opp_move = findOppMove1(*newBoard);
+        if(opp_move != nullptr)
         {
-            delete poss[i];
+            newBoard->doMove(opp_move, opponent);
+            delete opp_move;
         }
+        tempWeight = getWeight(move, newBoard, side);
+        if(tempWeight > weight)
+        {
+            weight = tempWeight;
+            finalMove = move;
+        }
+        delete newBoard;
     }
-    return move;
+    Move *nextMove = new Move(finalMove->getX(), finalMove->getY());
+    for(int i = 0; i < (int) poss.size(); i++)
+    {
+        delete poss[i];
+    }
+    currBoard.doMove(nextMove, side);
+    return nextMove;
 }
 
+/*
+ * Find the optimal move for the opponent to make in the minimax scheme, given
+ * board state.
+ */
 Move *Player::findOppMove(Board board)
 {
     vector<Move*> opponent_poss = possMoves(board, opponent);
+    if(opponent_poss.size() == 0)
+    {
+        return nullptr;
+    }
     Move *opp_move;
     int tempDiff, pieces = -100;
     for(Move * move : opponent_poss)
@@ -167,19 +240,22 @@ Move *Player::findOppMove(Board board)
         }
         delete temp;
     }
-    for(int i = 0; i < (int)opponent_poss.size(); i++)
+    Move * opp = new Move(opp_move->getX(), opp_move->getY());
+    for(int i = 0; i < (int) opponent_poss.size(); i++)
     {
-        if(opponent_poss[i] != opp_move)
-        {
-            delete opponent_poss[i];
-        }
+        delete opponent_poss[i];
     }
-    return opp_move;
+    return opp;
 }
 
+/*
+ * Perform a 2-ply mini_max algorithm to determine the next move to be made.
+ */
 Move *Player::mini_max()
 {
     vector<Move*> poss = possMoves(currBoard, side);
+    int pieceDiff = -100, tempDiff = 0;
+    Move* finalMove = nullptr;
     if(poss.size() == 0)
     {
         return nullptr;
@@ -188,37 +264,32 @@ Move *Player::mini_max()
     {
         Board *newBoard = currBoard.copy();
         newBoard->doMove(move, side);
-        State state = State(newBoard, move);
-        states.push_back(state);
-    }
-    int pieceDiff = -100, tempDiff = 0;
-    Move* finalMove = nullptr;
-    for(State state : states)
-    {
-        Move *opp_move = findOppMove(*(state.board));
-        state.board->doMove(opp_move, opponent);
+        Move *opp_move = findOppMove(*newBoard);
+        if(opp_move != nullptr)
+        {
+            newBoard->doMove(opp_move, opponent);
+            delete opp_move;
+        }
         if(side == BLACK)
         {
-            tempDiff = state.board->countBlack() - state.board->countWhite();
+            tempDiff = newBoard->countBlack() - newBoard->countWhite();
         }
         else
         {
-            tempDiff = state.board->countWhite() - state.board->countBlack();
+            tempDiff = newBoard->countWhite() - newBoard->countBlack();
         }
         if(pieceDiff < tempDiff)
         {
             pieceDiff = tempDiff;
-            finalMove = state.move;
+            finalMove = move;
         }
-        delete opp_move;
+        delete newBoard;
     }
-    for(int i = 0; i < (int)poss.size(); i++)
+    Move *nextMove = new Move(finalMove->getX(), finalMove->getY());
+    for(int i = 0; i < (int) poss.size(); i++)
     {
-        if(poss[i] != finalMove)
-        {
-            delete poss[i];
-        }
+        delete poss[i];
     }
-    //states.clear();
-    return finalMove;
+    currBoard.doMove(nextMove, side);
+    return nextMove;
 }

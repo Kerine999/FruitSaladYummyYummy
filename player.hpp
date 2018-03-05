@@ -7,20 +7,6 @@
 #include "board.hpp"
 using namespace std;
 
-class State {
-
-public:
-    State(Board *board, Move* move)
-    {
-        this->board = board;
-        this->move = move;
-    }
-    ~State()
-    {
-    }
-    Board *board;
-    Move* move;
-};
 
 class Player {
 
@@ -30,16 +16,17 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
     vector<Move*> possMoves(Board board, Side side);
-    Move* best(vector<Move*> poss);
+    int getWeight(Move* move, Board* testBoard, Side playSide);
+    Move *make_move();
+    Move *findOppMove1(Board board);
     Move* mini_max();
     Move *findOppMove(Board board);
 
     // Flag to tell if the player is running within the test_minimax context
-    bool testingMinimax = true;
+    bool testingMinimax;
     Side opponent;
     Board currBoard;
     Side side;
-    vector<State> states;
 };
 
 #endif
