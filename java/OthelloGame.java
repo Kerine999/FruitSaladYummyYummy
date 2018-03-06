@@ -18,7 +18,7 @@ import java.rmi.Remote;
  *
  * @author Aaron Plattner
  **/
-public class OthelloGame implements Runnable {
+public class OthelloGame{ //implements Runnable {
     /** The players. **/
     private OthelloPlayer black, white;
 
@@ -83,7 +83,7 @@ public class OthelloGame implements Runnable {
     /**
      * Runs the game.
      **/
-    public void run() {
+    public int run() {
         OthelloSide turn = OthelloSide.BLACK;
         Move m = null;
         OthelloResult r = new OthelloResult();
@@ -98,7 +98,7 @@ public class OthelloGame implements Runnable {
               r.conclusion = OthelloResult.BLACK_ERROR_CONCLUSION;
               observer.OnGameOver(r);
            }
-           return;
+           return -1;
         }
 
         try {
@@ -110,7 +110,7 @@ public class OthelloGame implements Runnable {
               r.conclusion = OthelloResult.BLACK_ERROR_CONCLUSION;
               observer.OnGameOver(r);
            }
-           return;
+           return -1;
         }
 
         // Run the game until there are no moves left.
@@ -156,7 +156,7 @@ public class OthelloGame implements Runnable {
                    observer.OnGameOver(r);
                }
 
-               return;
+               return -1;
             }
 
             // Make sure the move is legal.
@@ -171,7 +171,7 @@ public class OthelloGame implements Runnable {
                         r.conclusion = OthelloResult.WHITE_ERROR_CONCLUSION;
                     observer.OnGameOver(r);
                 }
-                return;
+                return -1;
             }
 
             // Notify the observer of the move.
@@ -197,6 +197,14 @@ public class OthelloGame implements Runnable {
             r.whiteScore = board.countWhite();
             // The total running time for these guys is already set.
             observer.OnGameOver(r);
+        }
+        if(r.blackScore>r.whiteScore)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
         }
     }
 

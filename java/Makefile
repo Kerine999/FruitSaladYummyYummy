@@ -1,4 +1,4 @@
-JAVAC   = javac
+JAVAC   = javac -source 1.5 -target 1.5
 SOURCES = $(wildcard *.java)
 CLASSES = $(SOURCES:.java=.class)
 

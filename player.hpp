@@ -17,7 +17,7 @@ public:
     Move *doMove(Move *opponentsMove, int msLeft);
     vector<Move*> possMoves(Board board, Side side);
     int getWeight(Move* move, Board* testBoard, Side playSide);
-    Move *make_move();
+    Move *make_move(Side s, int depth, Board b);
     Move *findOppMove1(Board board);
     Move* mini_max();
     Move *findOppMove(Board board);
@@ -27,6 +27,7 @@ public:
     Side opponent;
     Board currBoard;
     Side side;
+    int MAX_DEPTH=1;
 };
 
 #endif

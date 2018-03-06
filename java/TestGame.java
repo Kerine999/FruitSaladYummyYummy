@@ -12,7 +12,6 @@ public class TestGame {
             System.out.println(s);
             System.exit(-1);
         }
-        
         // Initialize the players.
         int which = 1;
         OthelloPlayer[] players = new OthelloPlayer[2];

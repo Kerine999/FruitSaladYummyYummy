@@ -131,7 +131,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     {
         return mini_max();
     }
-    return make_move();
+    return make_move(side,0,currBoard);
 }
 
 /*
@@ -172,9 +172,9 @@ Move *Player::findOppMove1(Board board)
  * which applies the heuristic used in getWeight() rather than simply the
  * difference between stones.
  */
-Move *Player::make_move()
+Move *Player::make_move(Side s, int depth, Board b)
 {
-    vector<Move*> poss = possMoves(currBoard, side);
+    vector<Move*> poss = possMoves(b, s);
     int weight = -10000, tempWeight = 0;
     Move* finalMove = nullptr;
     if(poss.size() == 0)
@@ -184,14 +184,25 @@ Move *Player::make_move()
     for(Move * move : poss)
     {
         Board *newBoard = currBoard.copy();
-        newBoard->doMove(move, side);
-        Move *opp_move = findOppMove1(*newBoard);
-        if(opp_move != nullptr)
+        newBoard->doMove(move, s);
+        if(depth<MAX_DEPTH)
         {
-            newBoard->doMove(opp_move, opponent);
-            delete opp_move;
+            if(s==BLACK)
+            {
+                Move* temp=make_move(WHITE,depth+1,*newBoard);
+                if(temp!=nullptr)
+                {
+                    newBoard->doMove(temp, WHITE);
+                }
+            }
+            else
+            {
+                Move* temp=make_move(BLACK,depth+1,*newBoard);
+                if(temp!=nullptr)
+                    newBoard->doMove(temp, BLACK);
+            }
         }
-        tempWeight = getWeight(move, newBoard, side);
+        tempWeight = getWeight(move, newBoard, s);
         if(tempWeight > weight)
         {
             weight = tempWeight;
@@ -204,7 +215,7 @@ Move *Player::make_move()
     {
         delete poss[i];
     }
-    currBoard.doMove(nextMove, side);
+    currBoard.doMove(nextMove, s);
     return nextMove;
 }
 
