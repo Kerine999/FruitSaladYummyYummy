@@ -27,7 +27,7 @@ public:
     Side opponent;
     Board currBoard;
     Side side;
-    int MAX_DEPTH=1;
+    int MAX_DEPTH=2;
 };
 
 #endif

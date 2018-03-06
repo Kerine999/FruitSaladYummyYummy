@@ -131,7 +131,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     {
         return mini_max();
     }
-    return make_move(side,0,currBoard);
+    Move* m=make_move(side,0,currBoard);
+    currBoard.doMove(m,side);
+    return m;
 }
 
 /*
@@ -183,7 +185,7 @@ Move *Player::make_move(Side s, int depth, Board b)
     }
     for(Move * move : poss)
     {
-        Board *newBoard = currBoard.copy();
+        Board *newBoard = b.copy();
         newBoard->doMove(move, s);
         if(depth<MAX_DEPTH)
         {
@@ -215,7 +217,6 @@ Move *Player::make_move(Side s, int depth, Board b)
     {
         delete poss[i];
     }
-    currBoard.doMove(nextMove, s);
     return nextMove;
 }
 
