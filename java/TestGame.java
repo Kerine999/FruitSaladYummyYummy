@@ -12,8 +12,6 @@ public class TestGame {
             System.out.println(s);
             System.exit(-1);
         }
-        int numWins=0;
-        for(int k=0;k<10;k++){
         // Initialize the players.
         int which = 1;
         OthelloPlayer[] players = new OthelloPlayer[2];
@@ -47,8 +45,7 @@ public class TestGame {
                 System.exit(-1);
             }
         }
-        numWins+=g.run();
-        }
-        System.out.println(numWins);
+        System.out.println("Starting game");
+        g.run();
     }
 }
