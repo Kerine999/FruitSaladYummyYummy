@@ -53,11 +53,10 @@ vector<Move*> Player::possMoves(Board board, Side playSide)
 /**
  * Assigns a weight to a move given a particular board state and a side to check.
  */
-double Player::getWeight(Move* move, Board* testBoard, Side playSide)
+int Player::getWeight(Move* move, Board* testBoard, Side playSide)
 {
     Board* temp=testBoard->copy();
-    double tempHeur = 0;
-    //number of pieces for each side
+    int tempHeur = 0;
     if(playSide==BLACK)
     {
         tempHeur=temp->countBlack()-temp->countWhite();
@@ -68,27 +67,45 @@ double Player::getWeight(Move* move, Board* testBoard, Side playSide)
     }
     if((move->getX()==0||move->getX()==7)&&(move->getY()==0||move->getY()==7))
     {
-        tempHeur*=4;
+        if(tempHeur < 0)
+            tempHeur/=40;
+        else
+            tempHeur*=40;
     }
     else if((move->getX()>=2 && move->getX()<=5)&&(move->getY()==0||move->getY()==7))
     {
-        tempHeur*=2;
+        if(tempHeur < 0)
+            tempHeur/=20;
+        else
+            tempHeur*=20;
     }
     else if((move->getX()==0||move->getX()==7)&&(move->getY()>=2&&move->getY()<=5))
     {
-        tempHeur*=2;
+        if(tempHeur < 0)
+            tempHeur/=20;
+        else
+            tempHeur*=20;
     }
     else if((move->getX()==1||move->getX()==6)&&(move->getY()==1||move->getY()==6))
     {
-        tempHeur/=4;
+        if(tempHeur < 0)
+            tempHeur*=40;
+        else
+            tempHeur/=40;
     }
     else if((move->getX()==0||move->getX()==7)&&(move->getY()==1||move->getY()==6))
     {
-        tempHeur/=2;
+        if(tempHeur < 0)
+            tempHeur*=20;
+        else
+            tempHeur/=20;
     }
     else if((move->getX()==1||move->getX()==6)&&(move->getY()==0||move->getY()==7))
     {
-        tempHeur/=2;
+        if(tempHeur < 0)
+            tempHeur*=20;
+        else
+            tempHeur/=20;
     }
     delete temp;
 
@@ -127,7 +144,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 Move *Player::make_move(Side s, int depth, Board b)
 {
     vector<Move*> poss = possMoves(b, s);
-    double weight = -10000, tempWeight = 0;
+    int weight = -10000, tempWeight = 0;
     Move* finalMove = nullptr;
     if(poss.size() == 0)
     {
