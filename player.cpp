@@ -53,10 +53,11 @@ vector<Move*> Player::possMoves(Board board, Side playSide)
 /**
  * Assigns a weight to a move given a particular board state and a side to check.
  */
-int Player::getWeight(Move* move, Board* testBoard, Side playSide)
+double Player::getWeight(Move* move, Board* testBoard, Side playSide)
 {
     Board* temp=testBoard->copy();
-    int tempHeur = 0;
+    double tempHeur = 0;
+    //number of pieces for each side
     if(playSide==BLACK)
     {
         tempHeur=temp->countBlack()-temp->countWhite();
@@ -67,45 +68,27 @@ int Player::getWeight(Move* move, Board* testBoard, Side playSide)
     }
     if((move->getX()==0||move->getX()==7)&&(move->getY()==0||move->getY()==7))
     {
-        if(tempHeur < 0)
-            tempHeur/=40;
-        else
-            tempHeur*=40;
+        tempHeur*=4;
     }
     else if((move->getX()>=2 && move->getX()<=5)&&(move->getY()==0||move->getY()==7))
     {
-        if(tempHeur < 0)
-            tempHeur/=20;
-        else
-            tempHeur*=20;
+        tempHeur*=2;
     }
     else if((move->getX()==0||move->getX()==7)&&(move->getY()>=2&&move->getY()<=5))
     {
-        if(tempHeur < 0)
-            tempHeur/=20;
-        else
-            tempHeur*=20;
+        tempHeur*=2;
     }
     else if((move->getX()==1||move->getX()==6)&&(move->getY()==1||move->getY()==6))
     {
-        if(tempHeur < 0)
-            tempHeur*=40;
-        else
-            tempHeur/=40;
+        tempHeur/=4;
     }
     else if((move->getX()==0||move->getX()==7)&&(move->getY()==1||move->getY()==6))
     {
-        if(tempHeur < 0)
-            tempHeur*=20;
-        else
-            tempHeur/=20;
+        tempHeur/=2;
     }
     else if((move->getX()==1||move->getX()==6)&&(move->getY()==0||move->getY()==7))
     {
-        if(tempHeur < 0)
-            tempHeur*=20;
-        else
-            tempHeur/=20;
+        tempHeur/=2;
     }
     delete temp;
 
@@ -137,39 +120,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 }
 
 /*
- * Find the optimal move for the opponent to make for the simple heuristic, given
- * a specific board state.
- */
-Move *Player::findOppMove1(Board board)
-{
-    vector<Move*> opponent_poss = possMoves(board, opponent);
-    if(opponent_poss.size() == 0)
-    {
-        return nullptr;
-    }
-    Move *opp_move = nullptr;
-    int tempDiff, pieces = -10000;
-    for(Move * move : opponent_poss)
-    {
-        Board* temp = board.copy();
-        temp->doMove(move, opponent);
-        tempDiff = getWeight(move, temp, opponent);
-        if(pieces < tempDiff)
-        {
-            pieces = tempDiff;
-            opp_move = move;
-        }
-        delete temp;
-    }
-    Move * opp = new Move(opp_move->getX(), opp_move->getY());
-    for(int i = 0; i < (int) opponent_poss.size(); i++)
-    {
-        delete opponent_poss[i];
-    }
-    return opp;
-}
-
-/*
  * Perform a move using the simple heuristic, which is essentially a 2-ply mini_max
  * which applies the heuristic used in getWeight() rather than simply the
  * difference between stones.
@@ -177,7 +127,7 @@ Move *Player::findOppMove1(Board board)
 Move *Player::make_move(Side s, int depth, Board b)
 {
     vector<Move*> poss = possMoves(b, s);
-    int weight = -10000, tempWeight = 0;
+    double weight = -10000, tempWeight = 0;
     Move* finalMove = nullptr;
     if(poss.size() == 0)
     {
