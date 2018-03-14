@@ -1,0 +1,3 @@
+I wrote the random player and a basic heuristic, Louis modified the heuristic to make it better then wrote minimax. I modified minimax to make it recursive and allow higher depth.
+
+We made no significant improvements to out AI, since we already beat constantTimePlayer and have enough points to pass the class. We did try modifying the heuristic more but the simple improvements did little to increase the overall result so we reverted to the old one.
