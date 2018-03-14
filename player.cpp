@@ -198,7 +198,7 @@ Move *Player::findOppMove(Board board)
     {
         return nullptr;
     }
-    Move *opp_move;
+    Move *opp_move = nullptr;
     int tempDiff, pieces = -100;
     for(Move * move : opponent_poss)
     {
